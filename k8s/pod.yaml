@@ -4,7 +4,7 @@ kind: Pod
 
 metadata:
 
-  name: todo-pod
+  name: todo-app
 
 spec:
 
@@ -12,7 +12,7 @@ spec:
 
   - name: todo-app
 
-    image: trainwithshubham/django-todo:latest
+    image: vikram5/todoapp:v1
 
     ports:
 

@@ -1,0 +1,33 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"todo-service","namespace":"default"},"spec":{"ports":[{"nodePort":30007,"port":80,"targetPort":8000}],"selector":{"app":"todo-app"},"type":"NodePort"}}
+  creationTimestamp: "2023-10-20T20:07:29Z"
+  name: todo-service
+  namespace: default
+  resourceVersion: "7013"
+  uid: 71939633-bb7b-4919-80b8-5de4bf9e3e70
+spec:
+  type: NodePort
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - nodePort: 30007
+    port: 80
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: todo-app
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
