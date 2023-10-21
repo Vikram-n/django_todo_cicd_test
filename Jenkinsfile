@@ -1,5 +1,4 @@
 pipeline {
-    
     agent any 
     
     environment {
@@ -7,49 +6,45 @@ pipeline {
     }
     
     stages {
-        
-        stage('Checkout'){
-           steps {
-                git credentialsId: 'github_login', 
-                url: 'https://github.com/Vikram-n/django_todo_cicd_test.git',
-                branch: 'develop'
-           }
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: 'develop']], 
+                          userRemoteConfigs: [[credentialsId: 'github_login', url: 'https://github.com/Vikram-n/django_todo_cicd_test.git']]
+                ])
+            }
         }
 
-        stage('Build Docker'){
-            steps{
-                script{
-                    sh '''
-                    echo 'Buid Docker Image'
-                    docker build -t vikram5/cicd-e2e:${BUILD_NUMBER} .
-                    '''
+        stage('Build Docker') {
+            steps {
+                script {
+                    def dockerImage = docker.build("vikram5/cicd-e2e:${BUILD_NUMBER}", ".")
                 }
             }
         }
 
-        stage('Push the artifacts'){
-           steps{
-                script{
-                    sh '''
-                    echo 'Push to Repo'
-                    docker push vikram5/cicd-e2e:${BUILD_NUMBER}
-                    '''
+        stage('Push the artifacts') {
+            steps {
+                script {
+                    def dockerImage = docker.image("vikram5/cicd-e2e:${BUILD_NUMBER}")
+                    dockerImage.push()
                 }
             }
         }
-        
-        stage('Checkout K8S manifest SCM'){
+
+        stage('Checkout K8S manifest SCM') {
             steps {
-                git credentialsId: 'github_login', 
-                url: 'https://github.com/Vikram-n/django_todo_cicd_test.git',
-                branch: 'develop'
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: 'develop']], 
+                          userRemoteConfigs: [[credentialsId: 'github_login', url: 'https://github.com/Vikram-n/django_todo_cicd_test.git']]
+                ])
             }
         }
-        
-        stage('Update K8S manifest & push to Repo'){
+
+        stage('Update K8S manifest & push to Repo') {
             steps {
-                script{
-                    withCredentials([usernamePassword(credentialsId: 'github_login', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) dir('k8s') {
+                withCredentials([usernamePassword(credentialsId: 'github_login', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    dir('k8s') {
                         sh '''
                         cat deploy.yaml
                         sed -i '' "s/32/${BUILD_NUMBER}/g" deploy.yaml
